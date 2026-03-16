@@ -1,0 +1,50 @@
+services:
+  # --- BASE DE DONNÉES ---
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      # Utilisation des variables définies dans le fichier .env
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    healthcheck:
+      # On utilise les variables ici aussi pour la cohérence
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  # --- BACKEND (API Eco-Eats) ---
+  api:
+    build: ./backend
+    restart: on-failure
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    environment:
+      # L'URL de connexion est construite dynamiquement
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # --- FRONTEND ---
+  client:
+    build: ./frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      api:
+        condition: service_healthy
