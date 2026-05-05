@@ -1,4 +1,3 @@
-// src/domain/entities/Consumable.ts
 import Price from "../value-objects/Price";
 
 export class Consumable {
