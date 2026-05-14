@@ -1,20 +1,14 @@
 import { Consumable } from './Consumable';
-import DeliveryDistance, { Coordinates } from '../value-objects/DeliveryDistance';
-import Price from '../value-objects/Price';
+import { DeliveryDistance, Coordinates } from '../value-objects/DeliveryDistance';
+import { Price } from '../value-objects/Price';
+import { OrderStatus } from '../value-objects/OrderStatus';
 
-export enum OrderStatus {
-  PENDING = 'PENDING',
-  PAID = 'PAID',
-  PREPARING = 'PREPARING',
-  DELIVERED = 'DELIVERED',
-  CANCELLED = 'CANCELLED'
-}
-
-export default class Order {
+export class Order {
   private _status: OrderStatus = OrderStatus.PENDING;
+  private _estimatedTimeInMinutes?: number;
   
-  private readonly SERVICE_FEE = new Price(2.50); 
-  private readonly PRICE_PER_KM = 1.20; 
+  private static readonly SERVICE_FEE = new Price(2.50); 
+  private static readonly PRICE_PER_KM = 1.20; 
 
   constructor(
     public readonly id: string,
@@ -22,7 +16,8 @@ export default class Order {
     public readonly restaurantId: string,
     private _items: Consumable[],
     public readonly restaurantLocation: Coordinates,
-    public readonly clientLocation: Coordinates
+    public readonly clientLocation: Coordinates,
+    public readonly tipAmount: Price = new Price(0)
   ) {
     this.validateOrder();
   }
@@ -33,18 +28,40 @@ export default class Order {
     }
   }
 
+  public accept(minutes: number): void {
+    if (this._status !== OrderStatus.PAID) {
+      throw new Error("Seule une commande payée peut être acceptée.");
+    }
+    this._estimatedTimeInMinutes = minutes;
+    this._status = OrderStatus.ACCEPTED;
+  }
+
+  get estimatedTime(): number | undefined {
+    return this._estimatedTimeInMinutes;
+  }
   
-  public calculateTotal(): number {
-    const itemsTotalAmount = this._items.reduce((sum, item) => sum + item.getFinalPrice(), 0);
-    const itemsPrice = new Price(itemsTotalAmount);
-
-    const deliveryDistance = new DeliveryDistance(this.restaurantLocation, this.clientLocation);
-    const distanceKm = deliveryDistance.getInKilometers();
+public calculateTotal(): number {
+    const subTotal = this.calculateItemsSubTotal();
+    const deliveryFees = this.calculateDeliveryFees();
     
-    const deliveryFees = new Price(distanceKm * this.PRICE_PER_KM);
-    const finalTotal = new Price(itemsPrice.value + deliveryFees.value + this.SERVICE_FEE.value);
+    const finalAmount = subTotal + 
+                        deliveryFees + 
+                        Order.SERVICE_FEE.value + 
+                        this.tipAmount.value; // Ajout du pourboire ici !
 
-    return finalTotal.value;
+    return Number(finalAmount.toFixed(2));
+  }
+
+  private calculateItemsSubTotal(): number {
+    return this._items.reduce(
+      (totalAccumulator, consumable) => totalAccumulator + consumable.getFinalPrice().value, 0
+    );
+  }
+
+  private calculateDeliveryFees(): number {
+    const distance = new DeliveryDistance(this.restaurantLocation, this.clientLocation);
+    const distanceInKm = distance.getInKilometers();
+    return distanceInKm * Order.PRICE_PER_KM;
   }
   
   get items(): Consumable[] {
@@ -57,5 +74,20 @@ export default class Order {
 
   public transitionTo(newStatus: OrderStatus): void {
     this._status = newStatus;
+  }
+
+  public updateStatus(newStatus: OrderStatus): void {
+        if (this.isFinalState()) {
+            throw new Error("Impossible de modifier le statut de cette commande (${this._status})");
+        }
+
+        this._status = newStatus as OrderStatus; 
+    }
+
+  private isFinalState(): boolean {
+    return (
+      this._status === OrderStatus.DELIVERED || 
+      this._status === OrderStatus.CANCELLED
+    );
   }
 }

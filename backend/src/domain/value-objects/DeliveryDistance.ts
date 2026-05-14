@@ -3,7 +3,7 @@ export interface Coordinates {
   longitude: number;
 }
 
-export default class DeliveryDistance {
+export class DeliveryDistance {
   private static readonly EARTH_RADIUS_METERS = 6371000;
 
   constructor(
@@ -36,7 +36,7 @@ export default class DeliveryDistance {
     return this.getInMeters() / 1000;
   }
 
-  // Application de  la formule d'Haversine pour le calcul de la distance à vol d'oiseau
+  // Application de  la formule d'Haversine pour le calcul de la distance à vol d'oiseau 
 
   private calculateHaversine(): number {
     const lat1 = this.toRadians(this.source.latitude);
