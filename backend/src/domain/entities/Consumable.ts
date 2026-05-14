@@ -1,12 +1,12 @@
-// src/domain/entities/Consumable.ts
-import Price from "../value-objects/Price";
+import { Allergen } from "../value-objects/Allergen";
+import { Price } from "../value-objects/Price";
 
 export class Consumable {
   constructor(
     public readonly id: string,
     public name: string,
     public description: string,
-    public allergens: string[],
+    public allergens: Allergen[],
     public price: Price,
     public category: string,
     public imageUrl: string,
@@ -40,11 +40,12 @@ export class Consumable {
     this._discountPercentage = percentage;
   }
 
-  public getFinalPrice(): number {
+  public getFinalPrice(): Price {
     if (this._discountPercentage === 0) {
-      return this.price.value;
+      return this.price;
     }
-    return this.price.value * (1 - this._discountPercentage / 100);
+    const finalPrice = this.price.value * (1 - this._discountPercentage / 100);
+    return new Price(finalPrice);
   }
 
   get stock(): number {
