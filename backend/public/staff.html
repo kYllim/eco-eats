@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoEats — Espace Staff</title>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: #0f4c75;
+      color: white;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { font-size: 1.1rem; }
+    .status {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: #0a3251;
+    }
+    .status.connected { background: #166534; }
+    .login {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+      padding: 2rem;
+    }
+    .login-box {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 360px;
+      border: 1px solid #e0e0e0;
+    }
+    .login-box h2 { margin-bottom: 1.5rem; font-size: 1.2rem; }
+    select, input, button {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 1rem;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+    button {
+      background: #0f4c75;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    button:hover { background: #0a3251; }
+    .main { display: none; flex: 1; gap: 1rem; padding: 1rem; overflow: hidden; }
+    .main.active { display: flex; }
+    .panel {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e0e0e0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 12px 16px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #e0e0e0;
+      background: #f9f9f9;
+    }
+    .panel-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .message {
+      max-width: 75%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+    .message.sent {
+      background: #0f4c75;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .message.received {
+      background: #f0f0f0;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    .message .meta {
+      font-size: 0.75rem;
+      opacity: 0.6;
+      margin-top: 4px;
+    }
+    .role-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: #dbeafe;
+      color: #1e40af;
+      margin-left: 6px;
+    }
+    .role-badge.ADMIN { background: #fef3c7; color: #92400e; }
+    .typing-indicator {
+      font-size: 0.8rem;
+      color: #888;
+      height: 20px;
+      padding: 0 16px;
+    }
+    .panel-input {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid #e0e0e0;
+    }
+    .panel-input input {
+      flex: 1;
+      margin: 0;
+    }
+    .panel-input button {
+      width: auto;
+      padding: 10px 16px;
+      margin: 0;
+      font-size: 0.85rem;
+    }
+    .group-panel { flex: 1; }
+    .private-panel { width: 340px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🧑‍💼 Espace Staff</h1>
+    <span class="status" id="status">Déconnecté</span>
+  </header>
+
+  <div class="login" id="login">
+    <div class="login-box">
+      <h2>Se connecter</h2>
+      <select id="userId">
+        <option value="moderator-1">moderator-1</option>
+        <option value="moderator-2">moderator-2</option>
+        <option value="admin-1">admin-1</option>
+      </select>
+      <select id="role">
+        <option value="MODERATOR">Modérateur</option>
+        <option value="ADMIN">Admin</option>
+      </select>
+      <button onclick="connect()">Se connecter</button>
+    </div>
+  </div>
+
+  <div class="main" id="main">
+    <div class="panel group-panel">
+      <div class="panel-header">💬 Salon Staff</div>
+      <div class="panel-messages" id="groupMessages"></div>
+      <div class="typing-indicator" id="groupTyping"></div>
+      <div class="panel-input">
+        <input
+          type="text"
+          id="groupInput"
+          placeholder="Message au salon..."
+          onkeyup="handleGroupKeyUp(event)"
+          oninput="handleGroupTyping()"
+        />
+        <button onclick="sendGroupMessage()">Envoyer</button>
+      </div>
+    </div>
+
+    <div class="panel private-panel">
+      <div class="panel-header">🔒 Chat privé — Livreurs</div>
+      <div class="panel-messages" id="privateMessages"></div>
+      <div class="typing-indicator" id="privateTyping"></div>
+      <div class="panel-input" style="flex-direction: column; gap: 6px;">
+        <select id="targetCourier" style="margin:0">
+          <option value="courier-1">courier-1 (Jean)</option>
+          <option value="courier-2">courier-2 (Marie)</option>
+          <option value="courier-3">courier-3 (Paul)</option>
+        </select>
+        <div style="display:flex; gap:6px;">
+          <input
+            type="text"
+            id="privateInput"
+            placeholder="Message privé..."
+            onkeyup="handlePrivateKeyUp(event)"
+            oninput="handlePrivateTyping()"
+            style="margin:0; flex:1"
+          />
+          <button onclick="sendPrivateMessage()" style="width:auto; margin:0; padding: 10px 12px;">↑</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let groupSocket = null;
+    let privateSocket = null;
+    let currentUserId = null;
+    let groupTypingTimeout = null;
+    let privateTypingTimeout = null;
+    let isGroupTyping = false;
+    let isPrivateTyping = false;
+
+    function connect() {
+      currentUserId = document.getElementById('userId').value;
+      const role = document.getElementById('role').value;
+
+      groupSocket = io('http://localhost:3000/group', {
+        query: { userId: currentUserId, role },
+        transports: ['websocket'],
+      });
+
+      privateSocket = io('http://localhost:3000/private', {
+        query: { userId: currentUserId },
+        transports: ['websocket'],
+      });
+
+      groupSocket.on('connect', () => {
+        document.getElementById('status').textContent = `${currentUserId} (${role})`;
+        document.getElementById('status').classList.add('connected');
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('main').classList.add('active');
+      });
+
+      groupSocket.on('history', (messages) => {
+        const container = document.getElementById('groupMessages');
+        container.innerHTML = '';
+        messages.forEach((m) => {
+          const isSent = m.senderId === currentUserId;
+          addGroupMessage(m.content, isSent, m.senderId, null, m.sentAt);
+        });
+      });
+
+      groupSocket.on('group_message', (message) => {
+        const isSent = message.senderId === currentUserId;
+        addGroupMessage(message.content, isSent, message.senderId, message.role, message.sentAt);
+      });
+
+      groupSocket.on('user_typing', (data) => {
+        document.getElementById('groupTyping').textContent =
+          `${data.userId} est en train d'écrire...`;
+      });
+
+      groupSocket.on('user_stop_typing', () => {
+        document.getElementById('groupTyping').textContent = '';
+      });
+
+      privateSocket.on('connect', () => {
+        privateSocket.emit('history', {
+          peerId: document.getElementById('targetCourier').value,
+        });
+      });
+
+      privateSocket.on('history', (messages) => {
+        const container = document.getElementById('privateMessages');
+        container.innerHTML = '';
+        messages.forEach((m) => {
+          const isSent = m.senderId === currentUserId;
+          addPrivateMessage(m.content, isSent, m.senderId, m.sentAt);
+        });
+      });
+
+      privateSocket.on('private_message', (message) => {
+        const isSent = message.senderId === currentUserId;
+        addPrivateMessage(message.content, isSent, message.senderId, message.sentAt);
+      });
+
+      privateSocket.on('user_typing', (data) => {
+        document.getElementById('privateTyping').textContent =
+          `${data.senderId} est en train d'écrire...`;
+      });
+
+      privateSocket.on('user_stop_typing', () => {
+        document.getElementById('privateTyping').textContent = '';
+      });
+    }
+
+    function sendGroupMessage() {
+      const input = document.getElementById('groupInput');
+      const content = input.value.trim();
+      if (!content || !groupSocket) return;
+      groupSocket.emit('send_group_message', { content });
+      input.value = '';
+      stopGroupTyping();
+    }
+
+    function sendPrivateMessage() {
+      const input = document.getElementById('privateInput');
+      const content = input.value.trim();
+      const receiverId = document.getElementById('targetCourier').value;
+      if (!content || !privateSocket) return;
+      privateSocket.emit('send_private_message', { receiverId, content });
+      input.value = '';
+      stopPrivateTyping();
+    }
+
+    document.getElementById('targetCourier').addEventListener('change', () => {
+      if (!privateSocket) return;
+      document.getElementById('privateMessages').innerHTML = '';
+      privateSocket.emit('history', { peerId: document.getElementById('targetCourier').value });
+    });
+
+    function handleGroupKeyUp(e) { if (e.key === 'Enter') sendGroupMessage(); }
+    function handlePrivateKeyUp(e) { if (e.key === 'Enter') sendPrivateMessage(); }
+
+    function handleGroupTyping() {
+      if (!groupSocket) return;
+      if (!isGroupTyping) { isGroupTyping = true; groupSocket.emit('typing'); }
+      clearTimeout(groupTypingTimeout);
+      groupTypingTimeout = setTimeout(stopGroupTyping, 1500);
+    }
+
+    function stopGroupTyping() {
+      if (!isGroupTyping || !groupSocket) return;
+      isGroupTyping = false;
+      groupSocket.emit('stop_typing');
+    }
+
+    function handlePrivateTyping() {
+      if (!privateSocket) return;
+      const receiverId = document.getElementById('targetCourier').value;
+      if (!isPrivateTyping) {
+        isPrivateTyping = true;
+        privateSocket.emit('typing', { receiverId });
+      }
+      clearTimeout(privateTypingTimeout);
+      privateTypingTimeout = setTimeout(stopPrivateTyping, 1500);
+    }
+
+    function stopPrivateTyping() {
+      if (!isPrivateTyping || !privateSocket) return;
+      isPrivateTyping = false;
+      const receiverId = document.getElementById('targetCourier').value;
+      privateSocket.emit('stop_typing', { receiverId });
+    }
+
+    function addGroupMessage(content, isSent, senderId, role, sentAt) {
+      const messages = document.getElementById('groupMessages');
+      const div = document.createElement('div');
+      div.className = `message ${isSent ? 'sent' : 'received'}`;
+      const time = new Date(sentAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      div.innerHTML = `
+        <div>${content}</div>
+        <div class="meta">
+          ${senderId}
+          ${!isSent ? `<span class="role-badge ${role}">${role}</span>` : ''}
+          · ${time}
+        </div>
+      `;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function addPrivateMessage(content, isSent, senderId, sentAt) {
+      const messages = document.getElementById('privateMessages');
+      const div = document.createElement('div');
+      div.className = `message ${isSent ? 'sent' : 'received'}`;
+      const time = new Date(sentAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      div.innerHTML = `
+        <div>${content}</div>
+        <div class="meta">${isSent ? 'Moi' : senderId} · ${time}</div>
+      `;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+  </script>
+</body>
+</html>

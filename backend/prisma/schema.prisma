@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Courier {
+  id                  String   @id
+  name                String
+  status              String   @default("UNAVAILABLE")
+  tier                String   @default("STANDARD")
+  walletBalance       Float    @default(0)
+  activeDeliveryIds   String[] @default([])
+  currentRestaurantId String?
+
+  deliveries Delivery[]
+}
+
+model Delivery {
+  id               String  @id
+  orderId          String
+  restaurantId     String
+  pickupLatitude   Float
+  pickupLongitude  Float
+  dropoffLatitude  Float
+  dropoffLongitude Float
+  distanceKm       Float
+  tipEur           Float
+  status           String  @default("PENDING")
+  courierId        String?
+
+  courier Courier? @relation(fields: [courierId], references: [id])
+
+  @@index([status])
+  @@index([courierId])
+}
+
+model Message {
+  id         String   @id
+  senderId   String
+  content    String
+  type       String
+  sentAt     DateTime @default(now())
+  receiverId String?
+  roomId     String?
+
+  @@index([type, roomId, sentAt])
+  @@index([type, senderId, receiverId, sentAt])
+}
