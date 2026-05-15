@@ -152,7 +152,7 @@ npm run start:express
 ```
 
 ````markdown
-## Démo Part A (Karen)
+## Part A 
 
 Le script `backend/main.ts` démontre les use cases Part A (création de commande, paiement, facture, gestion du stock). Il tourne **en standalone** (pas de Docker, pas de Postgres, repositories in-memory).
 
