@@ -53,7 +53,9 @@ export class PrivateChatGateway
   }
 
   handleDisconnect(client: Socket): void {
-    this.logger.log(`disconnected user=${this.userId(client)} socket=${client.id}`);
+    this.logger.log(
+      `disconnected user=${this.userId(client)} socket=${client.id}`,
+    );
   }
 
   @SubscribeMessage('history')

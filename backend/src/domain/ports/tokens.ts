@@ -1,3 +1,9 @@
 export const COURIER_REPOSITORY = Symbol('ICourierRepository');
 export const DELIVERY_REPOSITORY = Symbol('IDeliveryRepository');
 export const MESSAGE_REPOSITORY = Symbol('IMessageRepository');
+export const RESTAURANT_REPOSITORY = Symbol('IRestaurantRepository');
+export const CONSUMABLE_REPOSITORY = Symbol('IConsumableRepository');
+export const ORDER_REPOSITORY = Symbol('IOrderRepository');
+export const MENU_REPOSITORY = Symbol('IMenuRepository');
+export const USER_REPOSITORY = Symbol('IUserRepository');
+export const CART_REPOSITORY = Symbol('ICartRepository');

@@ -4,17 +4,20 @@ import type { ICourierRepository } from '../../../domain/ports/repositories';
 export class InMemoryCourierRepository implements ICourierRepository {
   private readonly couriers: Map<string, Courier> = new Map();
 
-  async findById(id: string): Promise<Courier | null> {
-    return this.couriers.get(id) ?? null;
+  findById(id: string): Promise<Courier | null> {
+    return Promise.resolve(this.couriers.get(id) ?? null);
   }
 
-  async findAvailable(): Promise<Courier[]> {
-    return Array.from(this.couriers.values()).filter(
-      (courier) => courier.status === 'AVAILABLE',
+  findAvailable(): Promise<Courier[]> {
+    return Promise.resolve(
+      Array.from(this.couriers.values()).filter(
+        (courier) => courier.status === 'AVAILABLE',
+      ),
     );
   }
 
-  async save(courier: Courier): Promise<void> {
+  save(courier: Courier): Promise<void> {
     this.couriers.set(courier.id, courier);
+    return Promise.resolve();
   }
 }

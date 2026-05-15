@@ -1,5 +1,9 @@
 import { PrismaClient } from '@prisma/client';
-import { Courier, CourierStatus, CourierTier } from '../../../domain/entities/Courier';
+import {
+  Courier,
+  CourierStatus,
+  CourierTier,
+} from '../../../domain/entities/Courier';
 import { Wallet } from '../../../domain/value-objects/Wallet';
 import type { ICourierRepository } from '../../../domain/ports/repositories';
 

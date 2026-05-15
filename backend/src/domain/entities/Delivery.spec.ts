@@ -16,10 +16,10 @@ describe('Delivery', () => {
     });
 
   it('starts PENDING with no courier', () => {
-    const d = build();
-    expect(d.status).toBe('PENDING');
-    expect(d.courierId).toBeNull();
-    expect(d.distanceKm).toBeGreaterThan(0);
+    const delivery = build();
+    expect(delivery.status).toBe('PENDING');
+    expect(delivery.courierId).toBeNull();
+    expect(delivery.distanceKm).toBeGreaterThan(0);
   });
 
   it('cannot be picked up while PENDING', () => {
@@ -27,12 +27,9 @@ describe('Delivery', () => {
   });
 
   it('walks the lifecycle PENDING → ASSIGNED → PICKED_UP → DELIVERED', () => {
-    const d = build()
-      .assignTo('c-1')
-      .markAsPickedUp()
-      .markAsDelivered();
-    expect(d.status).toBe('DELIVERED');
-    expect(d.courierId).toBe('c-1');
+    const delivery = build().assignTo('c-1').markAsPickedUp().markAsDelivered();
+    expect(delivery.status).toBe('DELIVERED');
+    expect(delivery.courierId).toBe('c-1');
   });
 
   it('cannot be assigned twice', () => {
@@ -41,8 +38,8 @@ describe('Delivery', () => {
   });
 
   it('exposes earnings = base + perKm * km + tip', () => {
-    const d = build();
-    const expected = 1.5 + 0.5 * d.distanceKm + 1.5;
-    expect(d.earnings).toBeCloseTo(expected, 5);
+    const delivery = build();
+    const expectedEarnings = 1.5 + 0.5 * delivery.distanceKm + 1.5;
+    expect(delivery.earnings).toBeCloseTo(expectedEarnings, 5);
   });
 });

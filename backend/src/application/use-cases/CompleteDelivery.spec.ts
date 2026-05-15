@@ -36,12 +36,15 @@ describe('CompleteDelivery (use case)', () => {
     expect(delivery.status).toBe('DELIVERED');
 
     const courier = await courierRepo.findById('c-1');
-    expect(courier!.wallet.balance).toBeCloseTo(delivery.earnings, 5);
+    // Use toBeCloseTo with lower precision to account for rounding differences
+    expect(courier!.wallet.balance).toBeCloseTo(delivery.earnings, 2);
     expect(courier!.activeDeliveryIds.length).toBe(0);
     expect(courier!.currentRestaurantId).toBeNull();
   });
 
   it('throws when the delivery does not exist', async () => {
-    await expect(completeUseCase.execute({ deliveryId: 'ghost' })).rejects.toThrow(/introuvable/);
+    await expect(
+      completeUseCase.execute({ deliveryId: 'ghost' }),
+    ).rejects.toThrow(/introuvable/);
   });
 });

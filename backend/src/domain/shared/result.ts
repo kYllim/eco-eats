@@ -4,7 +4,11 @@ export class Result<T> {
   public readonly error: string | null;
   private readonly _value: T | null;
 
-  private constructor(isSuccess: boolean, error: string | null, value: T | null) {
+  private constructor(
+    isSuccess: boolean,
+    error: string | null,
+    value: T | null,
+  ) {
     this.isSuccess = isSuccess;
     this.isFailure = !isSuccess;
     this.error = error;
@@ -12,7 +16,8 @@ export class Result<T> {
   }
 
   public getValue(): T {
-    if (!this.isSuccess) throw new Error("Impossible de récupérer la valeur d'un échec.");
+    if (!this.isSuccess)
+      throw new Error("Impossible de récupérer la valeur d'un échec.");
     return this._value as T;
   }
 

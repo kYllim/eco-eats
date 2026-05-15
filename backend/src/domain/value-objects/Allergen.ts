@@ -1,10 +1,10 @@
-export type AllowedAllergens = 
-  | 'Gluten' 
-  | 'Arachides' 
-  | 'Lait' 
-  | 'Œufs' 
-  | 'Poissons' 
-  | 'Soja' 
+export type AllowedAllergens =
+  | 'Gluten'
+  | 'Arachides'
+  | 'Lait'
+  | 'Œufs'
+  | 'Poissons'
+  | 'Soja'
   | 'Crustacés';
 
 export class Allergen {
@@ -17,11 +17,19 @@ export class Allergen {
 
   private validate(name: string): void {
     const validAllergens: string[] = [
-      'Gluten', 'Arachides', 'Lait', 'Œufs', 'Poissons', 'Soja', 'Crustacés'
+      'Gluten',
+      'Arachides',
+      'Lait',
+      'Œufs',
+      'Poissons',
+      'Soja',
+      'Crustacés',
     ];
 
     if (!validAllergens.includes(name)) {
-      throw new Error(`L'allergène "${name}" n'est pas reconnu par le système.`);
+      throw new Error(
+        `L'allergène "${name}" n'est pas reconnu par le système.`,
+      );
     }
   }
 

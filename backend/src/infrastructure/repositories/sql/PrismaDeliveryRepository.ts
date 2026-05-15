@@ -62,7 +62,10 @@ export class PrismaDeliveryRepository implements IDeliveryRepository {
       orderId: row.orderId,
       restaurantId: row.restaurantId,
       pickupLocation: Location.create(row.pickupLatitude, row.pickupLongitude),
-      dropoffLocation: Location.create(row.dropoffLatitude, row.dropoffLongitude),
+      dropoffLocation: Location.create(
+        row.dropoffLatitude,
+        row.dropoffLongitude,
+      ),
       distanceKm: row.distanceKm,
       tipEur: row.tipEur,
       status: row.status as DeliveryStatus,

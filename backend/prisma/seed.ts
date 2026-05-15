@@ -41,6 +41,27 @@ async function main(): Promise<void> {
     ],
   });
 
+  await prisma.restaurant.createMany({
+    data: [
+      {
+        id: 'resto-1',
+        ownerId: 'owner-1',
+        name: 'Le Bon Goût',
+        latitude: 48.8566,
+        longitude: 2.3522,
+        isOpen: true,
+      },
+      {
+        id: 'resto-2',
+        ownerId: 'owner-2',
+        name: 'La Cantine Verte',
+        latitude: 48.864716,
+        longitude: 2.349014,
+        isOpen: true,
+      },
+    ],
+  });
+
   await prisma.message.createMany({
     data: [
       {

@@ -6,17 +6,19 @@ export class Menu {
     public readonly restaurantId: string,
     public name: string,
     private items: Consumable[] = [],
-    public isActive: boolean = true
+    public isActive: boolean = true,
   ) {}
 
   public addItem(item: Consumable): void {
     if (item.restaurantId !== this.restaurantId) {
-      throw new Error("L'article doit appartenir au même restaurant que le menu.");
+      throw new Error(
+        "L'article doit appartenir au même restaurant que le menu.",
+      );
     }
     this.items.push(item);
   }
 
   public getAvailableItems(): Consumable[] {
-    return this.items.filter(item => item.isAvailable());
+    return this.items.filter((item) => item.isAvailable());
   }
 }

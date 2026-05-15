@@ -2,7 +2,7 @@ export enum UserRole {
   CLIENT = 'CLIENT',
   RESTAURANT_OWNER = 'RESTAURANT_OWNER',
   COURIER = 'COURIER',
-  ADMIN = 'ADMIN'
+  ADMIN = 'ADMIN',
 }
 
 export class User {
@@ -11,7 +11,7 @@ export class User {
     public readonly email: string,
     public readonly role: UserRole,
     public name: string,
-    public address?: string
+    public address?: string,
   ) {}
 
   public isOwner(): boolean {

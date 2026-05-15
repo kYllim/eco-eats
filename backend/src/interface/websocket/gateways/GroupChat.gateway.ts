@@ -117,14 +117,16 @@ export class GroupChatGateway
     client.to(STAFF_ROOM).emit('user_stop_typing', { userId });
   }
 
-  private userId(client: Socket): string | null {
-    const id = client.handshake.query.userId;
-    return typeof id === 'string' && id.length > 0 ? id : null;
+  private userId(client: Socket): string | undefined {
+    const queriedUserId = client.handshake.query.userId;
+    return typeof queriedUserId === 'string' && queriedUserId.length > 0
+      ? queriedUserId
+      : undefined;
   }
 
-  private role(client: Socket): UserRole | null {
-    const r = client.handshake.query.role;
-    if (r === 'MODERATOR' || r === 'ADMIN') return r;
-    return null;
+  private role(client: Socket): UserRole | undefined {
+    const roleValue = client.handshake.query.role;
+    if (roleValue === 'MODERATOR' || roleValue === 'ADMIN') return roleValue;
+    return undefined;
   }
 }

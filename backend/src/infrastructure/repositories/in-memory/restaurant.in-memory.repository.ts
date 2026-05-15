@@ -4,20 +4,23 @@ import { RestaurantRepository } from '../../../application/ports/restaurant.repo
 export class InMemoryRestaurantRepository implements RestaurantRepository {
   private restaurants: Restaurant[] = [];
 
-  public async save(restaurant: Restaurant): Promise<void> {
-    const index = this.restaurants.findIndex(restaurant => restaurant.id === restaurant.id);
+  public save(restaurant: Restaurant): Promise<void> {
+    const index = this.restaurants.findIndex((r) => r.id === restaurant.id);
     if (index !== -1) {
       this.restaurants[index] = restaurant;
     } else {
       this.restaurants.push(restaurant);
     }
+    return Promise.resolve();
   }
 
-  public async findById(id: string): Promise<Restaurant | null> {
-    return this.restaurants.find(restaurant => restaurant.id === id) || null;
+  public findById(id: string): Promise<Restaurant | null> {
+    return Promise.resolve(
+      this.restaurants.find((restaurant) => restaurant.id === id) || null,
+    );
   }
 
-  public async findAll(): Promise<Restaurant[]> {
-    return [...this.restaurants];
+  public findAll(): Promise<Restaurant[]> {
+    return Promise.resolve([...this.restaurants]);
   }
 }

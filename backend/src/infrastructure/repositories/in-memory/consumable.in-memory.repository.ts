@@ -4,28 +4,36 @@ import { ConsumableRepository } from '../../../application/ports/consumable.repo
 export class InMemoryConsumableRepository implements ConsumableRepository {
   private consumables: Consumable[] = [];
 
-  public async save(consumable: Consumable): Promise<void> {
-    const index = this.consumables.findIndex(consumable => consumable.id === consumable.id);
+  public save(consumable: Consumable): Promise<void> {
+    const index = this.consumables.findIndex((c) => c.id === consumable.id);
     if (index !== -1) {
       this.consumables[index] = consumable;
     } else {
       this.consumables.push(consumable);
     }
+    return Promise.resolve();
   }
 
-  public async findById(id: string): Promise<Consumable | null> {
-    return this.consumables.find(consumable => consumable.id === id) || null;
+  public findById(id: string): Promise<Consumable | null> {
+    return Promise.resolve(
+      this.consumables.find((consumable) => consumable.id === id) || null,
+    );
   }
 
-  public async findByIds(ids: string[]): Promise<Consumable[]> {
-    return this.consumables.filter(consumable => ids.includes(consumable.id));
+  public findByIds(ids: string[]): Promise<Consumable[]> {
+    return Promise.resolve(
+      this.consumables.filter((consumable) => ids.includes(consumable.id)),
+    );
   }
 
-  public async findAll(): Promise<Consumable[]> {
-    return [...this.consumables];
+  public findAll(): Promise<Consumable[]> {
+    return Promise.resolve([...this.consumables]);
   }
 
-  public async delete(id: string): Promise<void> {
-    this.consumables = this.consumables.filter(consumable => consumable.id !== id);
+  public delete(id: string): Promise<void> {
+    this.consumables = this.consumables.filter(
+      (consumable) => consumable.id !== id,
+    );
+    return Promise.resolve();
   }
 }

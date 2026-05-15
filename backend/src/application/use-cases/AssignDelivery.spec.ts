@@ -17,7 +17,9 @@ describe('AssignDelivery (use case)', () => {
     );
   });
 
-  const command = (override: Partial<Parameters<AssignDelivery['execute']>[0]> = {}) => ({
+  const command = (
+    override: Partial<Parameters<AssignDelivery['execute']>[0]> = {},
+  ) => ({
     deliveryId: 'd-1',
     orderId: 'o-1',
     restaurantId: 'resto-A',
@@ -31,7 +33,9 @@ describe('AssignDelivery (use case)', () => {
   });
 
   it('persists an ASSIGNED delivery and updates the courier', async () => {
-    const delivery = await useCase.execute(command());
+    const result = await useCase.execute(command());
+    expect(result.isFailure).toBe(false);
+    const delivery = result.getValue();
     expect(delivery.status).toBe('ASSIGNED');
     expect(delivery.courierId).toBe('c-1');
 
@@ -44,18 +48,24 @@ describe('AssignDelivery (use case)', () => {
   });
 
   it('rejects an unknown courier', async () => {
-    await expect(useCase.execute(command({ courierId: 'ghost' }))).rejects.toThrow(/Livreur introuvable/);
+    const result = await useCase.execute(command({ courierId: 'ghost' }));
+    expect(result.isFailure).toBe(true);
+    expect(result.error).toMatch(/Livreur introuvable/);
   });
 
   it('rejects a duplicate deliveryId', async () => {
     await useCase.execute(command());
-    await expect(useCase.execute(command())).rejects.toThrow(/déjà existante/);
+    const result = await useCase.execute(command());
+    expect(result.isFailure).toBe(true);
+    expect(result.error).toMatch(/déjà existante/);
   });
 
   it('rejects when the courier cannot accept', async () => {
     await useCase.execute(command());
-    await expect(
-      useCase.execute(command({ deliveryId: 'd-2', restaurantId: 'resto-B' })),
-    ).rejects.toThrow(/peut pas accepter/);
+    const result = await useCase.execute(
+      command({ deliveryId: 'd-2', restaurantId: 'resto-B' }),
+    );
+    expect(result.isFailure).toBe(true);
+    expect(result.error).toMatch(/peut pas accepter/);
   });
 });

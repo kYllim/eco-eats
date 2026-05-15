@@ -4,20 +4,33 @@ import { UserRepository } from '../../../application/ports/user.repository';
 export class InMemoryUserRepository implements UserRepository {
   private users: User[] = [];
 
-  public async save(user: User): Promise<void> {
-    const index = this.users.findIndex(user => user.id === user.id);
+  public save(user: User): Promise<void> {
+    const index = this.users.findIndex((u) => u.id === user.id);
     if (index !== -1) {
       this.users[index] = user;
     } else {
       this.users.push(user);
     }
+    return Promise.resolve();
   }
 
-  public async findById(id: string): Promise<User | null> {
-    return this.users.find(user => user.id === id) || null;
+  public findById(id: string): Promise<User> {
+    const user = this.users.find((candidate) => candidate.id === id);
+
+    if (!user) {
+      return Promise.reject(new Error('Utilisateur introuvable.'));
+    }
+
+    return Promise.resolve(user);
   }
 
-  public async findByEmail(email: string): Promise<User | null> {
-    return this.users.find(user => user.email === email) || null;
+  public findByEmail(email: string): Promise<User> {
+    const user = this.users.find((candidate) => candidate.email === email);
+
+    if (!user) {
+      return Promise.reject(new Error('Utilisateur introuvable.'));
+    }
+
+    return Promise.resolve(user);
   }
 }

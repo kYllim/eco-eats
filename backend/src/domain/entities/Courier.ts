@@ -6,6 +6,13 @@ export type CourierTier = 'STANDARD' | 'EXPERT';
 const MAX_DELIVERIES_STANDARD = 1;
 const MAX_DELIVERIES_EXPERT = 2;
 
+// Coefficients de rémunération
+const EARNINGS_MULTIPLIER_STANDARD = 1.0;
+const EARNINGS_MULTIPLIER_EXPERT = 1.5; // EXPERT gagne 50% de plus
+
+// Distance minimale pour préférer un livreur EXPERT (km)
+const DISTANCE_THRESHOLD_EXPERT = 2.0;
+
 export class Courier {
   private constructor(
     public readonly id: string,
@@ -83,11 +90,54 @@ export class Courier {
       : MAX_DELIVERIES_STANDARD;
   }
 
+  /**
+   * Vérifie si le livreur peut accepter une livraison
+   * Les EXPERT peuvent gérer 2 livraisons simultanées
+   */
   canAcceptDelivery(incomingRestaurantId: string): boolean {
     if (this._status === 'UNAVAILABLE') return false;
     if (this._activeDeliveryIds.length >= this._maxDeliveries) return false;
     if (this._currentRestaurantId === null) return true;
     return this._currentRestaurantId === incomingRestaurantId;
+  }
+
+  /**
+   * Détermine si ce livreur est préféré pour une livraison longue distance
+   * Les livreurs EXPERT sont préférés pour les longues distances
+   */
+  isPreferredForDistance(distanceKm: number): boolean {
+    if (this.tier !== 'EXPERT') {
+      return false;
+    }
+    return distanceKm >= DISTANCE_THRESHOLD_EXPERT;
+  }
+
+  /**
+   * Calcule les gains pour une livraison
+   * Les livreurs EXPERT gagnent un multiplier supérieur
+   */
+  calculateEarnings(baseEarnings: number): number {
+    const multiplier =
+      this.tier === 'EXPERT'
+        ? EARNINGS_MULTIPLIER_EXPERT
+        : EARNINGS_MULTIPLIER_STANDARD;
+    return Math.round(baseEarnings * multiplier * 100) / 100;
+  }
+
+  /**
+   * Retourne le nombre maximum de livraisons simultanées
+   */
+  getMaxConcurrentDeliveries(): number {
+    return this._maxDeliveries;
+  }
+
+  /**
+   * Retourne le multiplicateur de gains pour ce livreur
+   */
+  getEarningsMultiplier(): number {
+    return this.tier === 'EXPERT'
+      ? EARNINGS_MULTIPLIER_EXPERT
+      : EARNINGS_MULTIPLIER_STANDARD;
   }
 
   assignDelivery(deliveryId: string, restaurantId: string): Courier {
@@ -113,12 +163,16 @@ export class Courier {
     );
     const nextRestaurantId =
       remainingDeliveries.length === 0 ? null : this._currentRestaurantId;
+
+    // Appliquer le multiplicateur de gains selon le tier
+    const finalEarnings = this.calculateEarnings(earningsEur);
+
     return new Courier(
       this.id,
       this.name,
       this._status,
       this.tier,
-      this._wallet.credit(earningsEur),
+      this._wallet.credit(finalEarnings),
       remainingDeliveries,
       nextRestaurantId,
     );
