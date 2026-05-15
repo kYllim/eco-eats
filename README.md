@@ -93,6 +93,8 @@ EcoEats, une start-up française ambitieuse, souhaite concurrencer les géants d
 
 Prérequis : Docker + Docker Compose.
 
+> Le conteneur `api` lance **le serveur NestJS Part B** (chat WebSocket + endpoints REST livreur / messages). Pour exécuter le script de démo Part A (commande, paiement, facture), voir la section [Part A] plus bas.
+
 ```bash
 # 1. Copier le template d'environnement
 cp .env.example .env
@@ -148,6 +150,29 @@ cd backend
 npm run start:express
 # http://localhost:3001
 ```
+
+````markdown
+## Démo Part A (Karen)
+
+Le script `backend/main.ts` démontre les use cases Part A (création de commande, paiement, facture, gestion du stock). Il tourne **en standalone** (pas de Docker, pas de Postgres, repositories in-memory).
+
+```bash
+cd backend
+npm run demo:karen
+```
+
+Sortie attendue :
+
+```
+🚀 --- DÉMARRAGE DU TEST ECOEATS ---
+✅ Commande créée ! Total avec livraison : 19.1€
+📄 FACTURE GÉNÉRÉE : { invoiceId: 'FACT-...', total: 19.1, client: 'karen-77', items: [...] }
+📉 Stock restant : 9
+```
+
+Ce script n'est **pas** lancé automatiquement par `docker compose up` — il est délibérément séparé du serveur Nest pour éviter que le conteneur sorte au démarrage. C'est un harness de test rapide pour la Part A.
+````
+
 
 ## Variables d'environnement
 
