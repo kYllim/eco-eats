@@ -119,8 +119,14 @@ Postgres est exposé sur le port hôte `5433` (mappé vers `5432` du conteneur).
 ### Pages de test (servies par Nest)
 
 - http://localhost:3000/index.html — portail
+
+- http://localhost:3000/client.html — espace client (flux d'actualités SSE)
+
 - http://localhost:3000/courier.html — espace livreur (chat privé)
-- http://localhost:3000/staff.html — espace staff (groupe + privés)
+
+- http://localhost:3000/staff.html — espace staff (salon groupe + chat privé livreurs + lien modérateur)
+
+- http://localhost:3000/moderator.html — espace modération dédié (publication d'actualités en direct)
 
 ### Lancer le frontend React
 
@@ -238,6 +244,15 @@ Namespace `/group` (`ws://localhost:3000/group?userId=<id>&role=MODERATOR|ADMIN`
 | `send_group_message` | C → S | `{ content }` |
 | `group_message` | S → C | `{ id, senderId, role, content, sentAt }` |
 | `typing` / `stop_typing` | C ↔ C | (aucun) |
+
+### Server-Sent Events (SSE)
+
+Flux unidirectionnel descendant `/api/feed/stream` (`http://localhost:3000/api/feed/stream`)
+
+| Événement (Type) | Sens | Payload | Description |
+|---|---|---|---|
+| `welcome` | S → C | `{ message }` | Envoyé automatiquement dès l'ouverture de la connexion client |
+| `moderator.announcement` | S → C | `{ title, content }` | Diffusé en direct à tous les clients quand le modérateur publie une actu |
 
 ## Tests
 
