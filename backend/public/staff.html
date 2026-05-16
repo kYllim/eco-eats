@@ -237,8 +237,15 @@
       <div class="panel-messages" id="groupMessages"></div>
       <div class="typing-indicator" id="groupTyping"></div>
       <div class="panel-input">
-        <input type="text" id="groupInput" placeholder="Message au salon..." onkeyup="handleGroupKeyUp(event)"
-          oninput="handleGroupTyping()" />
+        <input
+          type="text"
+          id="groupInput"
+          placeholder="Message au salon..."
+          onkeyup="handleGroupKeyUp(event)"
+          oninput="handleGroupTyping()"
+          onfocus="handleGroupTyping()"
+          onblur="stopGroupTyping()"
+        />
         <button onclick="sendGroupMessage()">Envoyer</button>
       </div>
     </div>
@@ -254,8 +261,16 @@
           <option value="courier-3">courier-3 (Paul)</option>
         </select>
         <div style="display:flex; gap:6px;">
-          <input type="text" id="privateInput" placeholder="Message privé..." onkeyup="handlePrivateKeyUp(event)"
-            oninput="handlePrivateTyping()" style="margin:0; flex:1" />
+          <input
+            type="text"
+            id="privateInput"
+            placeholder="Message privé..."
+            onkeyup="handlePrivateKeyUp(event)"
+            oninput="handlePrivateTyping()"
+            onfocus="handlePrivateTyping()"
+            onblur="stopPrivateTyping()"
+            style="margin:0; flex:1"
+          />
           <button onclick="sendPrivateMessage()" style="width:auto; margin:0; padding: 10px 12px;">↑</button>
         </div>
       </div>

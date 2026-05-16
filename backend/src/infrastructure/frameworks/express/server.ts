@@ -1,11 +1,9 @@
 import express, { Request, Response } from 'express';
 
-// --- Repositories ---
 import { InMemoryOrderRepository } from '../../repositories/in-memory/order.in-memory.repository';
 import { InMemoryRestaurantRepository } from '../../repositories/in-memory/restaurant.in-memory.repository';
 import { InMemoryConsumableRepository } from '../../repositories/in-memory/consumable.in-memory.repository';
 
-// --- Use Cases ---
 import { CreateOrder } from '../../../application/usecases/Ordering/CreateOrder';
 import { PayOrder } from '../../../application/usecases/Ordering/PayOrder';
 import { GetOrderDetails } from '../../../application/usecases/Ordering/GetOrderDetails';
@@ -15,7 +13,6 @@ import { GetConsumable } from '../../../application/usecases/Consumable/GetConsu
 import { UpdateConsumable } from '../../../application/usecases/Consumable/UpdateConsumable';
 import { RemoveConsumable } from '../../../application/usecases/Consumable/RemoveConsumable';
 
-// --- Controllers ---
 import { OrderingController } from '../../../interface/controllers/ordering.controller';
 import { MenuController } from '../../../interface/controllers/menu.controller';
 import { DeliveryController } from '../../../interface/controllers/delivery.controller';
