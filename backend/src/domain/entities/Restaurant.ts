@@ -6,9 +6,13 @@ export class Restaurant {
     public readonly ownerId: string,
     public name: string,
     public location: Coordinates,
-    public isOpen: boolean = true
+    public isOpen: boolean = true,
   ) {}
 
-  public close(): void { this.isOpen = false; }
-  public open(): void { this.isOpen = true; }
+  public close(): void {
+    this.isOpen = false;
+  }
+  public open(): void {
+    this.isOpen = true;
+  }
 }

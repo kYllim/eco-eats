@@ -42,6 +42,8 @@ describe('CompleteDelivery (use case)', () => {
   });
 
   it('throws when the delivery does not exist', async () => {
-    await expect(completeUseCase.execute({ deliveryId: 'ghost' })).rejects.toThrow(/introuvable/);
+    await expect(
+      completeUseCase.execute({ deliveryId: 'ghost' }),
+    ).rejects.toThrow(/introuvable/);
   });
 });

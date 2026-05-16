@@ -2,7 +2,11 @@ import { Courier } from './Courier';
 
 describe('Courier', () => {
   const make = (overrides: { tier?: 'STANDARD' | 'EXPERT' } = {}) =>
-    Courier.create({ id: 'c-1', name: 'Jean', tier: overrides.tier ?? 'STANDARD' }).setAvailable();
+    Courier.create({
+      id: 'c-1',
+      name: 'Jean',
+      tier: overrides.tier ?? 'STANDARD',
+    }).setAvailable();
 
   it('rejects an empty name', () => {
     expect(() => Courier.create({ id: 'c', name: '   ' })).toThrow();

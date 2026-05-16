@@ -1,5 +1,5 @@
-import { Allergen } from "../value-objects/Allergen";
-import { Price } from "../value-objects/Price";
+import { Allergen } from '../value-objects/Allergen';
+import { Price } from '../value-objects/Price';
 
 export class Consumable {
   constructor(
@@ -12,7 +12,7 @@ export class Consumable {
     public imageUrl: string,
     public readonly restaurantId: string,
     private _stock: number,
-    private _discountPercentage: number = 0
+    private _discountPercentage: number = 0,
   ) {}
 
   public isAvailable(): boolean {
@@ -21,7 +21,7 @@ export class Consumable {
 
   public addStock(quantity: number): void {
     if (quantity <= 0) {
-      throw new Error("La quantité à ajouter doit être supérieure à 0");
+      throw new Error('La quantité à ajouter doit être supérieure à 0');
     }
     this._stock += quantity;
   }
@@ -35,7 +35,7 @@ export class Consumable {
 
   public setPromotion(percentage: number): void {
     if (percentage < 0 || percentage > 100) {
-      throw new Error("La promotion doit être comprise entre 0 et 100%");
+      throw new Error('La promotion doit être comprise entre 0 et 100%');
     }
     this._discountPercentage = percentage;
   }

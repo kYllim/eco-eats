@@ -11,9 +11,7 @@ export interface SendMessageCommand {
 }
 
 export class SendMessage {
-  constructor(
-    private readonly messageRepository: IMessageRepository,
-  ) {}
+  constructor(private readonly messageRepository: IMessageRepository) {}
 
   async execute(command: SendMessageCommand): Promise<Message> {
     const message = this.buildMessage(command);

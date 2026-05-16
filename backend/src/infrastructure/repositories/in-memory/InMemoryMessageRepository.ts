@@ -18,8 +18,7 @@ export class InMemoryMessageRepository implements IMessageRepository {
 
   async findGroupHistory(roomId: string): Promise<Message[]> {
     return this.messages.filter(
-      (message) =>
-        message.type === 'GROUP' && message.roomId === roomId,
+      (message) => message.type === 'GROUP' && message.roomId === roomId,
     );
   }
 

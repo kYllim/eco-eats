@@ -5,7 +5,9 @@ export class InMemoryRestaurantRepository implements RestaurantRepository {
   private restaurants: Restaurant[] = [];
 
   public async save(restaurant: Restaurant): Promise<void> {
-    const index = this.restaurants.findIndex(restaurant => restaurant.id === restaurant.id);
+    const index = this.restaurants.findIndex(
+      (item) => item.id === restaurant.id,
+    );
     if (index !== -1) {
       this.restaurants[index] = restaurant;
     } else {
@@ -14,7 +16,7 @@ export class InMemoryRestaurantRepository implements RestaurantRepository {
   }
 
   public async findById(id: string): Promise<Restaurant | null> {
-    return this.restaurants.find(restaurant => restaurant.id === id) || null;
+    return this.restaurants.find((restaurant) => restaurant.id === id) || null;
   }
 
   public async findAll(): Promise<Restaurant[]> {

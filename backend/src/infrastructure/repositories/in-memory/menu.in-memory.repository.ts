@@ -5,7 +5,7 @@ export class InMemoryMenuRepository implements MenuRepository {
   private menus: Menu[] = [];
 
   public async save(menu: Menu): Promise<void> {
-    const index = this.menus.findIndex(menu => menu.id === menu.id);
+    const index = this.menus.findIndex((menu) => menu.id === menu.id);
     if (index !== -1) {
       this.menus[index] = menu;
     } else {
@@ -14,6 +14,6 @@ export class InMemoryMenuRepository implements MenuRepository {
   }
 
   public async findByRestaurantId(restaurantId: string): Promise<Menu[]> {
-    return this.menus.filter(menu => menu.restaurantId === restaurantId);
+    return this.menus.filter((menu) => menu.restaurantId === restaurantId);
   }
 }

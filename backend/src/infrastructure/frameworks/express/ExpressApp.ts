@@ -15,8 +15,14 @@ export function createExpressApp(): Application {
   const deliveryRepository = new InMemoryDeliveryRepository();
   const messageRepository = new InMemoryMessageRepository();
 
-  const assignDelivery = new AssignDelivery(courierRepository, deliveryRepository);
-  const completeDelivery = new CompleteDelivery(courierRepository, deliveryRepository);
+  const assignDelivery = new AssignDelivery(
+    courierRepository,
+    deliveryRepository,
+  );
+  const completeDelivery = new CompleteDelivery(
+    courierRepository,
+    deliveryRepository,
+  );
   const sendMessage = new SendMessage(messageRepository);
 
   app.post('/couriers/deliveries', async (req: Request, res: Response) => {
@@ -35,27 +41,38 @@ export function createExpressApp(): Application {
     }
   });
 
-  app.post('/couriers/deliveries/:id/complete', async (req: Request, res: Response) => {
-    try {
-      const delivery = await completeDelivery.execute({ deliveryId: req.params.id as string});
-      res.status(200).json({
-        id: delivery.id,
-        status: delivery.status,
-        earnings: delivery.earnings,
-      });
-    } catch (error) {
-      res.status(404).json({ message: (error as Error).message });
-    }
-  });
+  app.post(
+    '/couriers/deliveries/:id/complete',
+    async (req: Request, res: Response) => {
+      try {
+        const delivery = await completeDelivery.execute({
+          deliveryId: req.params.id as string,
+        });
+        res.status(200).json({
+          id: delivery.id,
+          status: delivery.status,
+          earnings: delivery.earnings,
+        });
+      } catch (error) {
+        res.status(404).json({ message: (error as Error).message });
+      }
+    },
+  );
 
   app.get('/messages/private', async (req: Request, res: Response) => {
     try {
-      const { userIdA, userIdB } = req.query as { userIdA: string; userIdB: string };
+      const { userIdA, userIdB } = req.query as {
+        userIdA: string;
+        userIdB: string;
+      };
       if (!userIdA || !userIdB) {
         res.status(400).json({ message: 'userIdA et userIdB sont requis.' });
         return;
       }
-      const messages = await messageRepository.findPrivateHistory(userIdA, userIdB);
+      const messages = await messageRepository.findPrivateHistory(
+        userIdA,
+        userIdB,
+      );
       res.status(200).json(
         messages.map((m) => ({
           id: m.id,

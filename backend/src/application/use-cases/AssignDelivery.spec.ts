@@ -17,7 +17,9 @@ describe('AssignDelivery (use case)', () => {
     );
   });
 
-  const command = (override: Partial<Parameters<AssignDelivery['execute']>[0]> = {}) => ({
+  const command = (
+    override: Partial<Parameters<AssignDelivery['execute']>[0]> = {},
+  ) => ({
     deliveryId: 'd-1',
     orderId: 'o-1',
     restaurantId: 'resto-A',
@@ -44,7 +46,9 @@ describe('AssignDelivery (use case)', () => {
   });
 
   it('rejects an unknown courier', async () => {
-    await expect(useCase.execute(command({ courierId: 'ghost' }))).rejects.toThrow(/Livreur introuvable/);
+    await expect(
+      useCase.execute(command({ courierId: 'ghost' })),
+    ).rejects.toThrow(/Livreur introuvable/);
   });
 
   it('rejects a duplicate deliveryId', async () => {

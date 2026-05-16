@@ -7,6 +7,113 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model PrismaUser {
+  id      String       @id
+  email   String       @unique
+  role    String       // CLIENT, RESTAURANT_OWNER, COURIER, ADMIN
+  name    String
+  address String?
+  orders  PrismaOrder[]
+  cart    PrismaCart?
+}
+
+model PrismaCart {
+  id           String             @id
+  clientId     String             @unique
+  restaurantId String?
+  client       PrismaUser         @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  items        ItemsOnCarts[]
+}
+
+model ItemsOnCarts {
+  cartId       String
+  consumableId String
+  quantity     Int              @default(1)
+  
+  cart         PrismaCart       @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  consumable   PrismaConsumable @relation(fields: [consumableId], references: [id], onDelete: Cascade)
+
+  @@id([cartId, consumableId])
+}
+
+model PrismaRestaurant {
+  id        String             @id
+  ownerId   String
+  name      String
+  latitude  Float
+  longitude Float
+  isOpen    Boolean            @default(true)
+  menus     PrismaMenu[]
+  items     PrismaConsumable[]
+  orders    PrismaOrder[]
+  imageUrl  String
+}
+
+model PrismaMenu {
+  id           String             @id
+  name         String
+  restaurantId String
+  restaurant   PrismaRestaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  items        ConsumablesOnMenus[]
+}
+
+model PrismaConsumable {
+  id                 String               @id
+  name               String
+  description        String
+  price              Float                // Représente le Value Object Price
+  stock              Int
+  category           String
+  imageUrl           String
+  restaurantId       String
+  discountPercentage Float                @default(0)
+  allergens          String[]             // Tableau de chaînes pour mapper les Value Objects Allergen
+  
+  restaurant         PrismaRestaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  menus              ConsumablesOnMenus[]
+  carts              ItemsOnCarts[]
+  orders             ItemsOnOrders[]
+
+  @@index([restaurantId])
+}
+
+model ConsumablesOnMenus {
+  menuId       String
+  consumableId String
+
+  menu         PrismaMenu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  consumable   PrismaConsumable @relation(fields: [consumableId], references: [id], onDelete: Cascade)
+
+  @@id([menuId, consumableId])
+}
+
+model PrismaOrder {
+  id               String           @id
+  clientId         String
+  restaurantId     String
+  status           String           @default("PENDING")
+  pickupLatitude   Float            
+  pickupLongitude  Float
+  dropoffLatitude  Float            
+  dropoffLongitude Float
+  createdAt        DateTime         @default(now())
+  
+  client           PrismaUser       @relation(fields: [clientId], references: [id])
+  restaurant       PrismaRestaurant @relation(fields: [restaurantId], references: [id])
+  items            ItemsOnOrders[]
+}
+
+model ItemsOnOrders {
+  orderId      String
+  consumableId String
+  quantity     Int              @default(1)
+  
+  order        PrismaOrder      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  consumable   PrismaConsumable @relation(fields: [consumableId], references: [id], onDelete: Cascade)
+
+  @@id([orderId, consumableId])
+}
+
 model Courier {
   id                  String   @id
   name                String

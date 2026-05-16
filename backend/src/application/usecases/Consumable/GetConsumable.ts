@@ -6,7 +6,7 @@ export class GetConsumable {
   async execute(id: string) {
     const consumable = await this.consumableRepository.findById(id);
     if (!consumable) {
-      throw new Error("Article introuvable.");
+      throw new Error('Article introuvable.');
     }
     return consumable;
   }

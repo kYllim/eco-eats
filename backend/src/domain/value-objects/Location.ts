@@ -1,7 +1,6 @@
 const EARTH_RADIUS_KM = 6371;
 
-const toRadians = (degrees: number): number => 
-  (degrees * Math.PI) / 180;
+const toRadians = (degrees: number): number => (degrees * Math.PI) / 180;
 
 export class Location {
   private constructor(
@@ -12,12 +11,12 @@ export class Location {
   static create(latitude: number, longitude: number): Location {
     if (latitude < -90 || latitude > 90) {
       throw new Error(
-        `Latitude invalide : ${latitude}. Doit être entre -90 et 90.`
+        `Latitude invalide : ${latitude}. Doit être entre -90 et 90.`,
       );
     }
     if (longitude < -180 || longitude > 180) {
       throw new Error(
-        `Longitude invalide : ${longitude}. Doit être entre -180 et 180.`
+        `Longitude invalide : ${longitude}. Doit être entre -180 et 180.`,
       );
     }
     return new Location(latitude, longitude);
@@ -40,8 +39,7 @@ export class Location {
 
   equals(other: Location): boolean {
     return (
-      this.latitude === other.latitude && 
-      this.longitude === other.longitude
+      this.latitude === other.latitude && this.longitude === other.longitude
     );
   }
 }

@@ -27,10 +27,20 @@ describe('Message', () => {
 
   it('rejects an empty content', () => {
     expect(() =>
-      Message.createPrivate({ id: '1', senderId: 'a', receiverId: 'b', content: '   ' }),
+      Message.createPrivate({
+        id: '1',
+        senderId: 'a',
+        receiverId: 'b',
+        content: '   ',
+      }),
     ).toThrow();
     expect(() =>
-      Message.createGroupMessage({ id: '2', senderId: 'a', roomId: 'r', content: '' }),
+      Message.createGroupMessage({
+        id: '2',
+        senderId: 'a',
+        roomId: 'r',
+        content: '',
+      }),
     ).toThrow();
   });
 });

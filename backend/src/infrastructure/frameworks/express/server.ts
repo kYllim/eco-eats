@@ -23,13 +23,15 @@ import { DeliveryController } from '../../../interface/controllers/delivery.cont
 const app = express();
 app.use(express.json());
 
-// 1. Initialisation de la persistence
 const orderRepository = new InMemoryOrderRepository();
 const restaurantRepository = new InMemoryRestaurantRepository();
 const consumableRepository = new InMemoryConsumableRepository();
 
-// 2. Initialisation des Use Cases (sans le suffixe UC)
-const createOrder = new CreateOrder(orderRepository, restaurantRepository, consumableRepository);
+const createOrder = new CreateOrder(
+  orderRepository,
+  restaurantRepository,
+  consumableRepository,
+);
 const payOrder = new PayOrder(orderRepository, consumableRepository);
 const getOrderDetails = new GetOrderDetails(orderRepository);
 const getOrderHistory = new GetOrderHistory(orderRepository);
@@ -40,33 +42,47 @@ const getConsumable = new GetConsumable(consumableRepository);
 const updateConsumable = new UpdateConsumable(consumableRepository);
 const removeConsumable = new RemoveConsumable(consumableRepository);
 
-// 3. Injection dans les contrôleurs
 const orderingController = new OrderingController(
-  createOrder, 
-  payOrder, 
-  getOrderDetails, 
-  getOrderHistory
+  createOrder,
+  payOrder,
+  getOrderDetails,
+  getOrderHistory,
 );
 
 const menuController = new MenuController(
-  getConsumable, 
-  updateConsumable, 
-  removeConsumable
+  getConsumable,
+  updateConsumable,
+  removeConsumable,
 );
 
 const deliveryController = new DeliveryController(updateDeliveryStatus);
 
-// 4. Routes (Mapping HTTP)
-app.post('/orders', (req: Request, res: Response) => orderingController.handleCreate(req, res));
-app.get('/orders/:id', (req: Request, res: Response) => orderingController.handleGetDetails(req, res));
-app.post('/orders/:id/pay', (req: Request, res: Response) => orderingController.handlePay(req, res));
-app.get('/users/:clientId/orders', (req: Request, res: Response) => orderingController.handleGetHistory(req, res));
+app.post('/orders', (req: Request, res: Response) =>
+  orderingController.handleCreate(req, res),
+);
+app.get('/orders/:id', (req: Request, res: Response) =>
+  orderingController.handleGetDetails(req, res),
+);
+app.post('/orders/:id/pay', (req: Request, res: Response) =>
+  orderingController.handlePay(req, res),
+);
+app.get('/users/:clientId/orders', (req: Request, res: Response) =>
+  orderingController.handleGetHistory(req, res),
+);
 
-app.get('/consumables/:id', (req: Request, res: Response) => menuController.handleGet(req, res));
-app.patch('/consumables/:id', (req: Request, res: Response) => menuController.handleUpdate(req, res));
-app.delete('/consumables/:id', (req: Request, res: Response) => menuController.handleRemove(req, res));
+app.get('/consumables/:id', (req: Request, res: Response) =>
+  menuController.handleGet(req, res),
+);
+app.patch('/consumables/:id', (req: Request, res: Response) =>
+  menuController.handleUpdate(req, res),
+);
+app.delete('/consumables/:id', (req: Request, res: Response) =>
+  menuController.handleRemove(req, res),
+);
 
-app.patch('/orders/:id/status', (req: Request, res: Response) => deliveryController.handleUpdateStatus(req, res));
+app.patch('/orders/:id/status', (req: Request, res: Response) =>
+  deliveryController.handleUpdateStatus(req, res),
+);
 
 const PORT = 3000;
 app.listen(PORT, () => {

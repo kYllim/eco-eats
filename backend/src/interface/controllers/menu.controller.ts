@@ -7,19 +7,16 @@ export class MenuController {
   constructor(
     private readonly getConsumable: GetConsumable,
     private readonly updateConsumable: UpdateConsumable,
-    private readonly removeConsumable: RemoveConsumable
+    private readonly removeConsumable: RemoveConsumable,
   ) {}
 
-  /**
-   * Récupère un plat spécifique par son identifiant.
-   */
   async handleGet(request: Request, response: Response): Promise<void> {
     try {
       const consumableId = request.params.id as string;
       const consumable = await this.getConsumable.execute(consumableId);
-      
+
       if (!consumable) {
-        response.status(404).json({ error: "PLAT_INTROUVABLE" });
+        response.status(404).json({ error: 'PLAT_INTROUVABLE' });
         return;
       }
 
@@ -29,13 +26,13 @@ export class MenuController {
     }
   }
 
-  /**
-   * Met à jour les informations d'un plat.
-   */
   async handleUpdate(request: Request, response: Response): Promise<void> {
     try {
       const consumableId = request.params.id as string;
-      const updatedConsumable = await this.updateConsumable.execute(consumableId, request.body);
+      const updatedConsumable = await this.updateConsumable.execute(
+        consumableId,
+        request.body,
+      );
       response.json(updatedConsumable);
     } catch (error) {
       this.handleError(response, error);
@@ -53,7 +50,10 @@ export class MenuController {
   }
 
   private handleError(response: Response, error: unknown): void {
-    const message = error instanceof Error ? error.message : "Une erreur inconnue est survenue";
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Une erreur inconnue est survenue';
     response.status(400).json({ error: message });
   }
 }

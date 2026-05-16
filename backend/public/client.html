@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoEats — Espace Client</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+      background: #f5f5f5; 
+      padding: 2rem; 
+      color: #1a1a1a; 
+    }
+    .container { max-width: 600px; margin: 2rem auto; }
+    h1 { font-size: 1.8rem; color: #2ecc71; margin-bottom: 0.5rem; }
+    .status { 
+      padding: 0.6rem 1rem; 
+      background: #e8f8f5; 
+      border-radius: 8px; 
+      color: #117a65; 
+      margin-bottom: 1.5rem; 
+      display: inline-block; 
+      font-size: 0.9rem; 
+      font-weight: 500;
+    }
+    h2 { font-size: 1.2rem; margin-bottom: 1rem; color: #444; }
+    .feed-container { 
+      background: white; 
+      border: 1px solid #e0e0e0; 
+      border-radius: 12px; 
+      padding: 1.5rem; 
+      min-height: 250px; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .news-card { 
+      border-left: 4px solid #2ecc71; 
+      background: #fafafa; 
+      padding: 1rem; 
+      margin-bottom: 1rem; 
+      border-radius: 0 8px 8px 0; 
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    .news-title { font-weight: 600; margin-bottom: 0.25rem; font-size: 0.95rem; }
+    .news-content { color: #666; font-size: 0.9rem; line-height: 1.4; }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🛒 Mon Espace Client</h1>
+    <div class="status" id="connection-status">Connexion au fil d'actualités...</div>
+    
+    <h2>📢 Flux d'actualités Anti-Gaspi</h2>
+    <div class="feed-container" id="feed">
+    </div>
+  </div>
+
+  <script>
+    const eventSource = new EventSource('/api/feed/stream');
+    const statusDiv = document.getElementById('connection-status');
+    const feedDiv = document.getElementById('feed');
+
+    eventSource.onopen = () => {
+      statusDiv.textContent = '🟢 Connecté au fil d\'actualités en temps réel';
+      statusDiv.style.background = '#e8f8f5';
+      statusDiv.style.color = '#117a65';
+    };
+
+    eventSource.addEventListener('welcome', (event) => {
+      const data = JSON.parse(event.data);
+      feedDiv.innerHTML += `
+        <div class="news-card" style="border-left-color: #3498db">
+          <div class="news-title">👋 Système</div>
+          <div class="news-content">${data.message}</div>
+        </div>
+      `;
+    });
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      const title = data.title || data.name || 'Nouvelle offre !';
+      const body = data.content || data.description || 'Pas de description disponible.';
+      const priceHtml = data.price ? `<br><span style="color: #27ae60; font-weight: bold;">💰 Prix : ${data.price}€</span>` : '';
+
+      const newsHtml = `
+        <div class="news-card">
+          <div class="news-title">📢 ${title}</div>
+          <div class="news-content">
+            ${body}
+            ${priceHtml}
+          </div>
+        </div>
+      `;
+      feedDiv.innerHTML = newsHtml + feedDiv.innerHTML;
+    };
+
+    eventSource.onerror = () => {
+      statusDiv.textContent = '🔴 Déconnecté — Tentative de reconnexion...';
+      statusDiv.style.background = '#feadad';
+      statusDiv.style.color = '#781e1e';
+    };
+  </script>
+</body>
+</html>

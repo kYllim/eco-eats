@@ -56,10 +56,15 @@ export class Delivery {
       );
     }
     return new Delivery(
-      this.id, this.orderId, this.restaurantId,
-      this.pickupLocation, this.dropoffLocation,
-      this.distanceKm, this.tipEur,
-      'ASSIGNED', courierId,
+      this.id,
+      this.orderId,
+      this.restaurantId,
+      this.pickupLocation,
+      this.dropoffLocation,
+      this.distanceKm,
+      this.tipEur,
+      'ASSIGNED',
+      courierId,
     );
   }
 
@@ -70,10 +75,15 @@ export class Delivery {
       );
     }
     return new Delivery(
-      this.id, this.orderId, this.restaurantId,
-      this.pickupLocation, this.dropoffLocation,
-      this.distanceKm, this.tipEur,
-      'PICKED_UP', this.courierId,
+      this.id,
+      this.orderId,
+      this.restaurantId,
+      this.pickupLocation,
+      this.dropoffLocation,
+      this.distanceKm,
+      this.tipEur,
+      'PICKED_UP',
+      this.courierId,
     );
   }
 
@@ -84,10 +94,15 @@ export class Delivery {
       );
     }
     return new Delivery(
-      this.id, this.orderId, this.restaurantId,
-      this.pickupLocation, this.dropoffLocation,
-      this.distanceKm, this.tipEur,
-      'DELIVERED', this.courierId,
+      this.id,
+      this.orderId,
+      this.restaurantId,
+      this.pickupLocation,
+      this.dropoffLocation,
+      this.distanceKm,
+      this.tipEur,
+      'DELIVERED',
+      this.courierId,
     );
   }
 

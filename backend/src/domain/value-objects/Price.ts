@@ -1,7 +1,7 @@
 export class Price {
   constructor(public readonly value: number) {
     if (value < 0) {
-      throw new Error("Un prix ne peut pas être négatif.");
+      throw new Error('Un prix ne peut pas être négatif.');
     }
   }
 }

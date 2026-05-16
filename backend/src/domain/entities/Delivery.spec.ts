@@ -27,10 +27,7 @@ describe('Delivery', () => {
   });
 
   it('walks the lifecycle PENDING → ASSIGNED → PICKED_UP → DELIVERED', () => {
-    const d = build()
-      .assignTo('c-1')
-      .markAsPickedUp()
-      .markAsDelivered();
+    const d = build().assignTo('c-1').markAsPickedUp().markAsDelivered();
     expect(d.status).toBe('DELIVERED');
     expect(d.courierId).toBe('c-1');
   });
