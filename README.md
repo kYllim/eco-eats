@@ -32,6 +32,8 @@ EcoEats, une start-up française ambitieuse, souhaite concurrencer les géants d
 └── README.md
 ```
 
+PS: voir la branche wtr pour avoir la partie avec le feed qui permet aux modérateurs de publier une annonce
+
 ## Fonctionnalités
 
 ### 1. Client (la commande)
