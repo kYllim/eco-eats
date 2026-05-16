@@ -180,6 +180,8 @@
           placeholder="Message au salon..."
           onkeyup="handleGroupKeyUp(event)"
           oninput="handleGroupTyping()"
+          onfocus="handleGroupTyping()"
+          onblur="stopGroupTyping()"
         />
         <button onclick="sendGroupMessage()">Envoyer</button>
       </div>
@@ -202,6 +204,8 @@
             placeholder="Message privé..."
             onkeyup="handlePrivateKeyUp(event)"
             oninput="handlePrivateTyping()"
+            onfocus="handlePrivateTyping()"
+            onblur="stopPrivateTyping()"
             style="margin:0; flex:1"
           />
           <button onclick="sendPrivateMessage()" style="width:auto; margin:0; padding: 10px 12px;">↑</button>

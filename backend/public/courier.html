@@ -151,6 +151,8 @@
         placeholder="Écrire un message..."
         onkeyup="handleKeyUp(event)"
         oninput="handleTyping()"
+        onfocus="handleTyping()"
+        onblur="stopTyping()"
       />
       <button onclick="sendMessage()">Envoyer</button>
     </div>
